@@ -55,19 +55,19 @@ class PostsController extends Controller
             }
 
         }
-     }
+    }
 
         public function show($id)
         {
-        $post = Post::find($id);
+            $post = Post::find($id);
 
-        if ($post) {
+            if ($post) {
             return response()->json([
                 'success'   => true,
                 'message'   => 'Detail Post!',
                 'data'      => $post
             ], 200);
-        } else {
+            } else {
             return response()->json([
                 'success' => false,
                 'message' => 'Post Tidak Ditemukan!',
@@ -75,55 +75,59 @@ class PostsController extends Controller
         }
      }
 
-            public function update(Request $request, $id)
-        {
-            $validator = Validator::make($request->all(), [
-                'title'   => 'required',
-                'content' => 'required',
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'title'   => 'required',
+            'content' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Semua Kolom Wajib Diisi!',
+                'data'   => $validator->errors()
+            ],401);
+
+        } else {
+
+            $post = Post::whereId($id)->update([
+                'title'     => $request->input('title'),
+                'content'   => $request->input('content'),
             ]);
-
-            if ($validator->fails()) {
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Semua Kolom Wajib Diisi!',
-                    'data'   => $validator->errors()
-                ],401);
-
-            } else {
-
-                $post = Post::whereId($id)->update([
-                    'title'     => $request->input('title'),
-                    'content'   => $request->input('content'),
-                ]);
-
-                if ($post) {
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Post Berhasil Diupdate!',
-                        'data' => $post
-                    ], 201);
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Post Gagal Diupdate!',
-                    ], 400);
-                }
-
-            }
-        }
-        public function destroy($id)
-        {
-            $post = Post::whereId($id)->first();
-                $post->delete();
 
             if ($post) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Post Berhasil Dihapus!',
-                ], 200);
+                    'message' => 'Post Berhasil Diupdate!',
+                    'data' => $post
+                ], 201);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Post Gagal Diupdate!',
+                ], 400);
             }
 
         }
+    }
 
+    public function destroy($id)
+    {
+        $post = Post::whereId($id)->first();
+            $post->delete();
+
+        if ($post) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Post Berhasil Dihapus!',
+            ], 200);
+        }
+    }
+
+    public function data()
+    {
+        return 'Modified controller PostController';
+    }
 }
